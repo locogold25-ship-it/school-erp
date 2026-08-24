@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1210,40 +1211,14 @@ td .btn-xs + .btn-xs { margin-left: 3px; }
       <div class="login-welcome">Welcome 👋</div>
       <div class="login-hint">Choose how you'd like to enter</div>
       <div class="login-role-bar">
-        <button class="login-role-btn active" id="roleBtn_principal" onclick="selectRoleTab('principal')">
+        <button class="login-role-btn" onclick="enterAsRole('principal')">
           <i class="fas fa-user-tie"></i> Principal
         </button>
-        <button class="login-role-btn" id="roleBtn_accountant" onclick="selectRoleTab('accountant')">
+        <button class="login-role-btn" onclick="enterAsRole('accountant')">
           <i class="fas fa-calculator"></i> Accountant
         </button>
-        <button class="login-role-btn" id="roleBtn_teacher" onclick="selectRoleTab('teacher')">
+        <button class="login-role-btn" onclick="enterAsRole('teacher')">
           <i class="fas fa-chalkboard-teacher"></i> Teacher
-        </button>
-      </div>
-      <div id="principalLoginWrap">
-        <div class="login-field">
-          <label>Username</label>
-          <div class="login-input-wrap">
-            <i class="fas fa-user field-icon"></i>
-            <input type="text" id="loginUser" placeholder="Username" autocomplete="username" value="admin">
-          </div>
-        </div>
-        <div class="login-field">
-          <label>Password</label>
-          <div class="login-input-wrap">
-            <i class="fas fa-lock field-icon"></i>
-            <input type="password" id="loginPass" placeholder="Enter your password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doPrincipalLogin()">
-            <button class="toggle-pass" onclick="togglePassVis()" type="button" title="Show/hide password">
-              <i class="fas fa-eye" id="passEyeIcon"></i>
-            </button>
-          </div>
-        </div>
-        <div class="login-error" id="loginError">
-          <i class="fas fa-exclamation-circle"></i>
-          <span id="loginErrorMsg">Invalid username or password</span>
-        </div>
-        <button class="login-btn" id="loginBtn" onclick="doPrincipalLogin()">
-          <i class="fas fa-sign-in-alt"></i> Sign In
         </button>
       </div>
       <div id="teacherPickWrap" style="display:none;margin-top:6px">
@@ -1252,7 +1227,7 @@ td .btn-xs + .btn-xs { margin-left: 3px; }
         <button class="login-btn" onclick="enterAsTeacherPick()"><i class="fas fa-sign-in-alt"></i> Enter</button>
       </div>
       <div id="noTeacherMsg" class="login-lockout">No teacher accounts yet. Ask the Principal to add one from Manage Users.</div>
-      <div class="login-footer-text">🔒 Secured &nbsp;·&nbsp; Children's Paradise School ERP v23</div>
+      <div class="login-footer-text">Children's Paradise School ERP v23</div>
     </div>
   </div>
 </div>
@@ -1397,57 +1372,7 @@ function initData(){
 // ===========================
 let currentUser=null;
 
-// Tapping a role tab switches the visible panel. Principal needs a
-// password; Accountant/Teacher are provisioned by the Principal via
-// Manage Users, so they go straight in.
-function selectRoleTab(role){
-  ['principal','accountant','teacher'].forEach(r=>{
-    const btn=document.getElementById('roleBtn_'+r);
-    if(btn) btn.className='login-role-btn'+(r===role?' active':'');
-  });
-  document.getElementById('principalLoginWrap').style.display=role==='principal'?'block':'none';
-  document.getElementById('teacherPickWrap').style.display='none';
-  document.getElementById('noTeacherMsg').classList.remove('show');
-  document.getElementById('loginError').classList.remove('show');
-  if(role==='principal'){
-    initData();
-    document.getElementById('loginPass').value='';
-    document.getElementById('loginPass').focus();
-  } else {
-    enterAsRole(role);
-  }
-}
-
-function doPrincipalLogin(){
-  initData();
-  const u=(document.getElementById('loginUser').value||'').trim();
-  const p=(document.getElementById('loginPass').value||'').trim();
-  if(!u||!p){showLoginError('Please enter both username and password.');return;}
-  const users=ls('users')||[];
-  const user=users.find(x=>x.role==='principal'&&x.username===u&&x.password===p&&x.active!==false);
-  if(user){
-    showLoginError('');
-    enterAs(user);
-  } else {
-    showLoginError('Incorrect username or password.');
-    document.getElementById('loginPass').value='';
-    document.getElementById('loginPass').focus();
-  }
-}
-function showLoginError(msg){
-  const el=document.getElementById('loginError');
-  document.getElementById('loginErrorMsg').textContent=msg;
-  el.className=msg?'login-error show':'login-error';
-}
-function togglePassVis(){
-  const inp=document.getElementById('loginPass');
-  const icon=document.getElementById('passEyeIcon');
-  if(inp.type==='password'){inp.type='text';icon.className='fas fa-eye-slash';}
-  else{inp.type='password';icon.className='fas fa-eye';}
-}
-
-// One-tap entry for Accountant/Teacher — these accounts are created
-// by the Principal from Manage Users, so no password is needed here.
+// No password gate — just pick a role and go straight into the app.
 function enterAsRole(role){
   initData(); // make sure the default users (admin/accountant) exist
   document.getElementById('teacherPickWrap').style.display='none';
